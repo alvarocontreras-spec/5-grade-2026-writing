@@ -3,237 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writing Assessment: My Daily Routine</title>
+    <title>Word Counter</title>
     <style>
-        :root {
-            --edu-blue: #2980b9;
-            --edu-green: #27ae60;
-            --edu-bg: #f8f9fa;
-            --text-dark: #2c3e50;
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--edu-bg);
-            color: var(--text-dark);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .task-header {
-            border-bottom: 3px solid var(--edu-blue);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
-
-        .instructions {
-            background: #e1f5fe;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-        }
-
-        .vocabulary-box {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            background: #fff9c4;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px dashed #fbc02d;
-        }
-
-        .writing-zone {
-            position: relative;
-        }
-
-        textarea {
-            width: 100%;
-            height: 220px;
-            padding: 15px;
-            font-size: 1.1rem;
-            border: 2px solid #bdc3c7;
-            border-radius: 10px;
-            resize: none;
-            box-sizing: border-box;
-            line-height: 1.8;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--edu-blue);
-        }
-
-        .check-list {
-            margin-top: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .pill {
-            padding: 5px 12px;
-            background: #eee;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            transition: 0.3s;
-        }
-
-        .pill.active {
-            background: var(--edu-green);
-            color: white;
-        }
-
-        .btn-check {
-            width: 100%;
-            padding: 15px;
-            background: var(--edu-blue);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
+        #wordCounter {
+            margin-top: 10px;
             font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        #feedback {
-            margin-top: 25px;
-            display: none;
-            padding: 20px;
-            border-radius: 8px;
-            background: #fdfdfd;
-            border: 1px solid #ddd;
-        }
-
-        .score-box {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--edu-blue);
-            text-align: center;
-            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
+    <textarea id="textArea" rows="10" cols="50" placeholder="Type your text here..."></textarea>
+    <div id="wordCounter">Word Count: 0</div>
 
-<div class="container">
-    <div class="task-header">
-        <h1>TASK: My Daily Routine</h1>
-        <p><strong>Assessment Level:</strong> A2 (5th Year)</p>
-    </div>
-
-    <div class="instructions">
-        <strong>📝 Instructions:</strong> Write 5–6 sentences about your routine. 
-        Use the structures: <em>I wake up at, I go to, I eat, I play, I like... because, I go to bed at.</em>
-    </div>
-
-    <div class="vocabulary-box">
-        <div><strong>Time:</strong> morning, afternoon, night</div>
-        <div><strong>Places:</strong> school, home</div>
-        <div><strong>Actions:</strong> play, eat, study, watch TV</div>
-        <div><strong>Feelings:</strong> happy, tired, fun</div>
-    </div>
-
-    <div class="writing-zone">
-        <textarea id="studentText" placeholder="I wake up at..."></textarea>
-        
-        <div class="check-list" id="structureCheck">
-            <span class="pill" id="s1">Wake up at</span>
-            <span class="pill" id="s2">Go to</span>
-            <span class="pill" id="s3">Eat</span>
-            <span class="pill" id="s4">Play</span>
-            <span class="pill" id="s5">Like... because</span>
-            <span class="pill" id="s6">Go to bed at</span>
-        </div>
-    </div>
-
-    <button class="btn-check" onclick="evaluateRoutine()">Submit Writing</button>
-
-    <div id="feedback">
-        <div class="score-box" id="finalScore"></div>
-        <div id="feedbackDetails"></div>
-    </div>
-</div>
-
-<script>
-    const textInput = document.getElementById('studentText');
-    
-    // LIVE CHECKER: Detecta estructuras mientras escriben (andamiaje cognitivo)
-    textInput.addEventListener('input', () => {
-        const val = textInput.value.toLowerCase();
-        
-        document.getElementById('s1').classList.toggle('active', val.includes('wake up at'));
-        document.getElementById('s2').classList.toggle('active', val.includes('go to'));
-        document.getElementById('s3').classList.toggle('active', val.includes('eat'));
-        document.getElementById('s4').classList.toggle('active', val.includes('play'));
-        document.getElementById('s5').classList.toggle('active', val.includes('like') && val.includes('because'));
-        document.getElementById('s6').classList.toggle('active', val.includes('go to bed at'));
-    });
-
-    function evaluateRoutine() {
-        const text = textInput.value.trim();
-        const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-        const feedbackDiv = document.getElementById('feedback');
-        const details = document.getElementById('feedbackDetails');
-        
-        // 1. Detección de Plagio/Copia del Modelo
-        const modelKey = "7:00. I go to school in the morning. I eat lunch at school.";
-        if (text.includes(modelKey)) {
-            alert("⚠️ Warning: Please do not copy the model text. Write your own routine!");
-            return;
+    <script>
+        function countWords(text) {
+            return text.trim().split(/\s+/).filter(function(word) { return word.length > 0; }).length;
         }
 
-        // 2. Cálculo de puntos
-        let points = 0;
-        let tips = [];
+        const textArea = document.getElementById('textArea');
+        const wordCounter = document.getElementById('wordCounter');
 
-        // Evaluar Cantidad de oraciones
-        if (sentences.length >= 5) points += 40;
-        else points += (sentences.length * 8);
-
-        // Evaluar Estructuras (Andamiaje)
-        const structs = ['wake up at', 'go to', 'eat', 'play', 'like', 'because', 'go to bed at'];
-        let structCount = 0;
-        structs.forEach(s => { if(text.toLowerCase().includes(s)) structCount++; });
-        points += (structCount * 8);
-
-        // Evaluar Vocabulario
-        const vocab = ['morning', 'afternoon', 'night', 'school', 'home', 'lunch', 'study', 'watch tv', 'happy', 'tired', 'fun'];
-        let vocabUsed = vocab.filter(v => text.toLowerCase().includes(v));
-        if (vocabUsed.length >= 3) points += 10;
-
-        if (points > 100) points = 100;
-
-        // 3. Renderizar Feedback
-        feedbackDiv.style.display = 'block';
-        document.getElementById('finalScore').innerText = `Score: ${points}/100`;
-
-        let evalText = `
-            <p><strong>Sentence Count:</strong> ${sentences.length} sentences detected.</p>
-            <p><strong>Structures used:</strong> ${structCount} of 7 key phrases found.</p>
-            <p><strong>Vocabulary:</strong> You used ${vocabUsed.length} words from the Word Box.</p>
-            <hr>
-            <p><em>${points >= 70 ? "✅ Great job! You followed the instructions perfectly." : "💡 Tip: Try to use all the required structures to improve your score."}</em></p>
-        `;
-        
-        details.innerHTML = evalText;
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }
-</script>
-
+        textArea.addEventListener('input', function() {
+            const wordCount = countWords(textArea.value);
+            wordCounter.textContent = 'Word Count: ' + wordCount;
+        });
+    </script>
 </body>
 </html>
