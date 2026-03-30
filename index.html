@@ -3,180 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writing Task: My Daily Routine (Strict Range)</title>
+    <title>Writing Assessment: My Daily Routine</title>
     <style>
+        /* Estilos centrados en el estudiante - Minimalismo y Claridad */
         :root {
-            --primary: #3498db;
-            --success: #27ae60;
-            --warning: #f1c40f;
-            --error: #e74c3c;
-            --bg: #f4f7f6;
+            --primary-blue: #2980b9;
+            --success-green: #27ae60;
+            --error-red: #e74c3c;
+            --warning-yellow: #f1c40f;
+            --bg-light: #f4f7f6;
+            --text-dark: #2c3e50;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            padding: 20px;
         }
 
         .container {
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
             background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
-        .objective-card {
-            background: #ebf5fb;
-            border-left: 5px solid var(--primary);
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+        header {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
         }
 
-        .instructions {
-            background: #fff9db;
+        .objective {
+            background: #eef2f3;
             padding: 15px;
             border-radius: 8px;
+            font-size: 0.9rem;
+            border-left: 5px solid var(--primary-blue);
             margin-bottom: 20px;
-            border: 1px solid #f1c40f;
-            font-size: 0.95rem;
         }
 
-        .writing-wrapper {
+        .instruction-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .box {
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .instructions { background: #fff9db; border: 1px solid #f1c40f; }
+        .vocabulary { background: #e8f8f5; border: 1px solid #2ecc71; }
+        .model { background: #fdf2e9; border: 1px solid #e67e22; grid-column: span 2; }
+
+        .writing-zone {
             position: relative;
+            margin-top: 20px;
         }
 
         textarea {
             width: 100%;
-            height: 200px;
-            padding: 15px;
+            height: 220px;
+            padding: 20px;
             font-size: 1.1rem;
             border: 2px solid #ddd;
-            border-radius: 10px;
+            border-radius: 12px;
             resize: none;
             box-sizing: border-box;
+            font-family: inherit;
             transition: all 0.3s ease;
         }
 
         textarea:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 8px rgba(41, 128, 185, 0.2);
         }
 
-        /* Contador flotante con estados de color */
+        /* Contador Dinámico sobre el Box */
         .word-counter {
             position: absolute;
             bottom: 15px;
             right: 15px;
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             background: #eee;
             color: #666;
-            pointer-events: none;
-            transition: 0.3s;
+            transition: all 0.3s;
         }
 
-        .count-low { color: var(--error); }
-        .count-ok { background: var(--success); color: white; }
-        .count-high { background: var(--error); color: white; }
+        .count-bad { color: var(--error-red); background: #fdeaea; }
+        .count-good { color: white; background: var(--success-green); transform: scale(1.05); }
 
         .btn-submit {
             width: 100%;
-            padding: 15px;
-            background: var(--primary);
+            padding: 16px;
+            background: var(--primary-blue);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
             margin-top: 20px;
+            transition: background 0.3s;
         }
 
-        #feedback {
-            margin-top: 20px;
+        .btn-submit:hover { background: #1a5276; }
+
+        #feedbackArea {
+            margin-top: 30px;
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 10px;
             display: none;
+            animation: fadeIn 0.5s ease;
         }
 
-        .pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .success-report { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-report { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        .checklist {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            list-style: none;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="objective-card">
-        <strong>🎯 Objective:</strong> Describe your routine using Present Simple. 
-        <br><strong>Constraint:</strong> Write between <strong>50 and 60 words</strong>.
+    <header>
+        <h1>My Daily Routine</h1>
+        <p>A2 English Writing Task - 5th Year</p>
+    </header>
+
+    <div class="objective">
+        <strong>🎯 Goal:</strong> Talk about your daily routine. Use Present Simple to describe 5-6 actions.
     </div>
 
-    <div class="instructions">
-        <strong>📝 Task:</strong> Include <em>wake up at, go to, eat, play, like... because,</em> and <em>go to bed at.</em>
+    <div class="instruction-grid">
+        <div class="box instructions">
+            <strong>📝 Instructions:</strong>
+            <ul>
+                <li>Write 5–6 sentences.</li>
+                <li>Range: <strong>50 - 60 words</strong>.</li>
+                <li>Use: <em>and, but, because.</em></li>
+            </ul>
+        </div>
+        <div class="box vocabulary">
+            <strong>🧱 Vocabulary Box:</strong><br>
+            Morning, afternoon, night, lunch, school, home, study, watch TV, happy, fun.
+        </div>
+        <div class="box model">
+            <strong>📌 Model (Do not copy!):</strong><br>
+            <em>I wake up at 7:00. I go to school in the morning. I eat lunch at school. In the afternoon, I play football. I like football because it is fun. I go to bed at 10:00.</em>
+        </div>
     </div>
 
-    <div class="writing-wrapper">
-        <textarea id="mainText" placeholder="I wake up at..."></textarea>
-        <div id="counter" class="word-counter">Words: 0</div>
+    <div class="writing-zone">
+        <textarea id="writingBox" placeholder="Start writing here using: I wake up at, I go to, I eat, I play..."></textarea>
+        <div id="counter" class="word-counter">Words: 0 / 50-60</div>
     </div>
 
-    <button class="btn-submit" onclick="validateText()">Validate & Submit</button>
+    <button class="btn-submit" onclick="evaluateProduction()">Submit Final Task</button>
 
-    <div id="feedback"></div>
+    <div id="feedbackArea"></div>
 </div>
 
 <script>
-    const textArea = document.getElementById('mainText');
+    const writingBox = document.getElementById('writingBox');
     const counter = document.getElementById('counter');
-    const feedback = document.getElementById('feedback');
+    const feedbackArea = document.getElementById('feedbackArea');
 
-    textArea.addEventListener('input', () => {
-        const words = textArea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+    // Lógica del contador en tiempo real
+    writingBox.addEventListener('input', () => {
+        const text = writingBox.value.trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        
         counter.innerText = `Words: ${words}`;
 
-        // Feedback visual del contador
-        counter.classList.remove('count-low', 'count-ok', 'count-high');
-        
-        if (words < 50) {
-            counter.classList.add('count-low');
-        } else if (words >= 50 && words <= 60) {
-            counter.classList.add('count-ok');
+        // Feedback visual del rango 50-60
+        if (words >= 50 && words <= 60) {
+            counter.className = 'word-counter count-good';
             counter.innerText = `Words: ${words} (Perfect!)`;
-        } else {
-            counter.classList.add('count-high');
+        } else if (words > 60) {
+            counter.className = 'word-counter count-bad';
             counter.innerText = `Words: ${words} (Too long)`;
+        } else {
+            counter.className = 'word-counter';
         }
     });
 
-    function validateText() {
-        const text = textArea.value.trim();
-        const words = text.split(/\s+/).filter(w => w.length > 0).length;
-        feedback.style.display = 'block';
+    function evaluateProduction() {
+        const text = writingBox.value.trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        
+        // Evitar entrega vacía
+        if (words < 5) {
+            alert("Please write your routine before submitting.");
+            return;
+        }
 
-        if (words >= 50 && words <= 60) {
-            feedback.className = 'pass';
-            feedback.innerHTML = `
-                <strong>✅ Task Accepted!</strong><br>
-                Your text has ${words} words. You followed the length instructions perfectly.
+        // Validación de Estructuras (Andamiaje)
+        const structures = [
+            { id: 'Wake up', regex: /wake up at/i },
+            { id: 'Go to', regex: /go to/i },
+            { id: 'Eat', regex: /eat/i },
+            { id: 'Play', regex: /play/i },
+            { id: 'Like/Because', regex: /like.*because/i },
+            { id: 'Bedtime', regex: /go to bed at/i }
+        ];
+
+        let foundCount = 0;
+        let checklistHTML = '<ul class="checklist">';
+        
+        structures.forEach(s => {
+            const isFound = s.regex.test(text);
+            if (isFound) foundCount++;
+            checklistHTML += `<li>${isFound ? '✅' : '❌'} Structure: "${s.id}"</li>`;
+        });
+        checklistHTML += '</ul>';
+
+        // Verificación de Longitud
+        const isLengthCorrect = (words >= 50 && words <= 60);
+        
+        // Renderizar Feedback
+        feedbackArea.style.display = 'block';
+        if (isLengthCorrect && foundCount >= 4) {
+            feedbackArea.className = 'success-report';
+            feedbackArea.innerHTML = `
+                <h3>🌟 Excellent Work!</h3>
+                <p>You followed the instructions. Your text has <strong>${words}</strong> words.</p>
+                ${checklistHTML}
+                <p><em>Great job using the mandatory structures!</em></p>
             `;
         } else {
-            feedback.className = 'fail';
-            const diff = words < 50 ? (50 - words) + " more words" : (words - 60) + " words too many";
-            feedback.innerHTML = `
-                <strong>❌ Length Requirement Not Met</strong><br>
-                Your text has ${words} words. You need ${diff} to be in the 50-60 range.
+            feedbackArea.className = 'error-report';
+            feedbackArea.innerHTML = `
+                <h3>⚠️ Needs Review</h3>
+                <p>Words: <strong>${words}</strong> (Goal: 50-60).</p>
+                <p>Check the list below to see what is missing:</p>
+                ${checklistHTML}
+                <p><strong>Tip:</strong> Ensure you have at least 50 words and use the "because" structure.</p>
             `;
         }
-        
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+        feedbackArea.scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 
