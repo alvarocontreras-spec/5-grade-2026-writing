@@ -3,30 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Counter</title>
+    <title>Writing Task: My Daily Routine (Strict Range)</title>
     <style>
-        #wordCounter {
-            margin-top: 10px;
-            font-weight: bold;
+        :root {
+            --primary: #3498db;
+            --success: #27ae60;
+            --warning: #f1c40f;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
         }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .objective-card {
+            background: #ebf5fb;
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .instructions {
+            background: #fff9db;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f1c40f;
+            font-size: 0.95rem;
+        }
+
+        .writing-wrapper {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            resize: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Contador flotante con estados de color */
+        .word-counter {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            background: #eee;
+            color: #666;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .count-low { color: var(--error); }
+        .count-ok { background: var(--success); color: white; }
+        .count-high { background: var(--error); color: white; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
-    <textarea id="textArea" rows="10" cols="50" placeholder="Type your text here..."></textarea>
-    <div id="wordCounter">Word Count: 0</div>
 
-    <script>
-        function countWords(text) {
-            return text.trim().split(/\s+/).filter(function(word) { return word.length > 0; }).length;
+<div class="container">
+    <div class="objective-card">
+        <strong>🎯 Objective:</strong> Describe your routine using Present Simple. 
+        <br><strong>Constraint:</strong> Write between <strong>50 and 60 words</strong>.
+    </div>
+
+    <div class="instructions">
+        <strong>📝 Task:</strong> Include <em>wake up at, go to, eat, play, like... because,</em> and <em>go to bed at.</em>
+    </div>
+
+    <div class="writing-wrapper">
+        <textarea id="mainText" placeholder="I wake up at..."></textarea>
+        <div id="counter" class="word-counter">Words: 0</div>
+    </div>
+
+    <button class="btn-submit" onclick="validateText()">Validate & Submit</button>
+
+    <div id="feedback"></div>
+</div>
+
+<script>
+    const textArea = document.getElementById('mainText');
+    const counter = document.getElementById('counter');
+    const feedback = document.getElementById('feedback');
+
+    textArea.addEventListener('input', () => {
+        const words = textArea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+        counter.innerText = `Words: ${words}`;
+
+        // Feedback visual del contador
+        counter.classList.remove('count-low', 'count-ok', 'count-high');
+        
+        if (words < 50) {
+            counter.classList.add('count-low');
+        } else if (words >= 50 && words <= 60) {
+            counter.classList.add('count-ok');
+            counter.innerText = `Words: ${words} (Perfect!)`;
+        } else {
+            counter.classList.add('count-high');
+            counter.innerText = `Words: ${words} (Too long)`;
         }
+    });
 
-        const textArea = document.getElementById('textArea');
-        const wordCounter = document.getElementById('wordCounter');
+    function validateText() {
+        const text = textArea.value.trim();
+        const words = text.split(/\s+/).filter(w => w.length > 0).length;
+        feedback.style.display = 'block';
 
-        textArea.addEventListener('input', function() {
-            const wordCount = countWords(textArea.value);
-            wordCounter.textContent = 'Word Count: ' + wordCount;
-        });
-    </script>
+        if (words >= 50 && words <= 60) {
+            feedback.className = 'pass';
+            feedback.innerHTML = `
+                <strong>✅ Task Accepted!</strong><br>
+                Your text has ${words} words. You followed the length instructions perfectly.
+            `;
+        } else {
+            feedback.className = 'fail';
+            const diff = words < 50 ? (50 - words) + " more words" : (words - 60) + " words too many";
+            feedback.innerHTML = `
+                <strong>❌ Length Requirement Not Met</strong><br>
+                Your text has ${words} words. You need ${diff} to be in the 50-60 range.
+            `;
+        }
+        
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+
 </body>
 </html>
