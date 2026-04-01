@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writing Assessment A2-B1 - Secure Submission</title>
+    <title>Sistema de Evaluación de Escritura</title>
     <style>
         :root {
             --primary: #2980b9;
@@ -25,7 +25,7 @@
         }
 
         .container {
-            max-width: 850px;
+            max-width: 800px;
             width: 100%;
             background: white;
             padding: 40px;
@@ -35,7 +35,6 @@
 
         header { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 25px; padding-bottom: 10px; }
 
-        /* Estilo para los campos de datos del alumno */
         .student-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -52,8 +51,6 @@
             box-sizing: border-box;
         }
 
-        input:focus { border-color: var(--primary); outline: none; }
-
         .instruction-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -69,7 +66,7 @@
         .writing-zone { position: relative; }
         textarea {
             width: 100%;
-            height: 220px;
+            height: 200px;
             padding: 20px;
             font-size: 1.1rem;
             border: 2px solid #ddd;
@@ -102,6 +99,7 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 20px;
+            transition: 0.3s;
         }
 
         .btn-submit:disabled { background: #bdc3c7; cursor: not-allowed; }
@@ -111,20 +109,18 @@
             display: none;
             padding: 25px;
             border-radius: 12px;
-            border: 2px solid #ddd;
+            background: #f9f9f9;
+            border: 2px solid #eee;
             animation: fadeIn 0.5s ease;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .level-badge {
-            display: inline-block;
-            padding: 10px 25px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
+        .report-title { font-weight: bold; display: block; margin-top: 15px; margin-bottom: 8px; color: var(--primary); font-size: 1.1rem; }
+        .feedback-list { padding-left: 20px; margin: 0; }
+        .feedback-list li { margin-bottom: 8px; line-height: 1.4; }
+        .improve { color: #d35400; font-weight: 600; }
+        .correct { color: var(--success); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -132,109 +128,128 @@
 <div class="container">
     <header>
         <h1>Writing Assessment: Daily Routine</h1>
-        <p>A2–B1 Official Submission</p>
+        <p>Complete sus datos y realice la actividad de escritura.</p>
     </header>
 
-    <div id="alreadySubmittedMsg" style="display:none; color: var(--error); text-align: center; font-weight: bold; margin-bottom: 20px;">
-        ⚠️ You have already submitted this task. Only one submission is allowed.
+    <div id="blockMessage" style="display:none; color: var(--error); text-align: center; font-weight: bold; margin-bottom: 20px; padding: 15px; border: 1px solid var(--error); border-radius: 8px; background-color: #fdeaea;">
+        ⚠️ Ya has enviado esta tarea. Solo se permite un envío por estudiante.
     </div>
 
     <div class="student-info-grid">
-        <input type="text" id="firstName" placeholder="First Name" required>
-        <input type="text" id="lastName" placeholder="Last Name" required>
-        <input type="text" id="course" placeholder="Course/Grade" required>
+        <input type="text" id="firstName" placeholder="Nombre" required>
+        <input type="text" id="lastName" placeholder="Apellido" required>
+        <input type="text" id="course" placeholder="Curso" required>
     </div>
 
     <div class="instruction-grid">
-        <div class="box instructions"><strong>📝 Rules:</strong> 40-60 words. Use Present Simple.</div>
-        <div class="box vocabulary"><strong>🧱 Keywords:</strong> wake up, school, lunch, happy.</div>
-        <div class="box model"><strong>🚫 Do NOT copy the alien example.</strong></div>
+        <div class="box instructions"><strong>📝 Reglas:</strong> 40-60 palabras. Usa Presente Simple y conectores.</div>
+        <div class="box vocabulary"><strong>🧱 Palabras clave:</strong> wake up, school, lunch, happy, then.</div>
+        <div class="box model"><strong>🚫 Recordatorio:</strong> No copies el ejemplo del alien (Mars/screws).</div>
     </div>
 
     <div class="writing-zone">
-        <textarea id="writingBox" placeholder="Start your routine here..."></textarea>
-        <div id="counter" class="word-counter">Words: 0 / 40-60</div>
+        <textarea id="writingBox" placeholder="Escribe aquí tu rutina diaria..."></textarea>
+        <div id="counter" class="word-counter">Palabras: 0 / 40-60</div>
     </div>
 
-    <button id="submitBtn" class="btn-submit" onclick="analyzeAndSubmit()">Submit Task</button>
+    <button id="submitBtn" class="btn-submit" onclick="processSubmission()">Enviar y Ver Retroalimentación</button>
 
     <div id="feedbackArea">
-        <div style="text-align: center;">
-            <h2>Evaluation Ready</h2>
-            <div id="levelBadgeArea"></div>
+        <h2 style="text-align: center; color: var(--text); border-bottom: 2px solid #ddd; padding-bottom: 10px;">Retroalimentación para el Estudiante</h2>
+        
+        <div>
+            <span class="report-title">💡 Sugerencias de mejora:</span>
+            <ul id="improveList" class="feedback-list"></ul>
         </div>
-        <div id="grammarFeedback"></div>
-        <div id="vocabFeedback"></div>
+        
+        <div>
+            <span class="report-title">✅ Fortalezas:</span>
+            <ul id="correctList" class="feedback-list"></ul>
+        </div>
     </div>
 </div>
 
 <script>
-    const scriptURL = "TU_URL_DE_APPS_SCRIPT"; // REEMPLAZA CON TU URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycby-0PHNKPAI-eq766H9GF8aKQ5YDi5omxdx28s94LjnOxrQH7J5x-L6cw4YJGBP9wxxOQ/exec";
 
-    // 1. Verificar si ya envió al cargar la página
-    window.onload = function() {
-        if (localStorage.getItem("taskSubmitted") === "true") {
+    // Verificar si ya envió previamente
+    window.onload = () => {
+        if (localStorage.getItem("assignment_completed") === "true") {
             document.getElementById('submitBtn').disabled = true;
             document.getElementById('writingBox').disabled = true;
-            document.getElementById('alreadySubmittedMsg').style.display = 'block';
+            document.getElementById('blockMessage').style.display = 'block';
         }
     };
 
     // Contador de palabras
     document.getElementById('writingBox').addEventListener('input', function() {
         const words = this.value.trim().split(/\s+/).filter(w => w.length > 0).length;
-        document.getElementById('counter').innerText = `Words: ${words}`;
+        const counter = document.getElementById('counter');
+        counter.innerText = `Palabras: ${words} / 40-60`;
+        counter.style.color = (words >= 40 && words <= 60) ? "var(--success)" : "var(--error)";
     });
 
-    async function analyzeAndSubmit() {
+    async function processSubmission() {
         const text = document.getElementById('writingBox').value.trim();
         const fName = document.getElementById('firstName').value.trim();
         const lName = document.getElementById('lastName').value.trim();
         const course = document.getElementById('course').value.trim();
+        const words = text.split(/\s+/).filter(w => w.length > 0);
 
-        if (!fName || !lName || !course || !text) {
-            return alert("Please fill in all fields.");
+        if (!fName || !lName || !course || !text) return alert("Por favor, completa tus datos y el texto.");
+        if (words.length < 10) return alert("El texto es muy corto para analizarlo.");
+
+        // Lógica de Retroalimentación
+        const improve = [];
+        const correct = [];
+
+        // Análisis de extensión
+        if (words.length < 40 || words.length > 60) {
+            improve.push(`<span class="improve">Extensión:</span> Tu texto tiene ${words.length} palabras. El objetivo es estar entre 40 y 60.`);
+        } else {
+            correct.push("Has cumplido con la extensión de palabras solicitada.");
         }
 
-        const words = text.split(/\s+/).filter(w => w.length > 0);
-        if (words.length < 15) return alert("Text too short.");
+        // Análisis gramatical básico
+        if (/\bI\s+wakes\b/i.test(text)) improve.push(`<span class="improve">Verbos:</span> Con "I" usa "wake", no "wakes".`);
+        if (/\bgo school\b/i.test(text)) improve.push(`<span class="improve">Estructura:</span> Recuerda usar "go TO school".`);
+        if (!/\b(and|but|because|then|finally)\b/i.test(text)) improve.push(`<span class="improve">Conectores:</span> Intenta usar palabras como 'then' o 'because' para unir tus frases.`);
+        else correct.push("Utilizas conectores para organizar tus ideas.");
 
-        // Mostrar Feedback rápido (Simulado para brevedad)
+        // Análisis de vocabulario temático
+        if (/\b(morning|afternoon|night|evening)\b/i.test(text)) correct.push("Haces un buen uso de expresiones de tiempo.");
+        else improve.push(`<span class="improve">Vocabulario:</span> Podrías incluir momentos del día (in the morning, at night, etc.).`);
+
+        // Mostrar Feedback
+        document.getElementById('improveList').innerHTML = improve.map(i => `<li>${i}</li>`).join('') || "<li>¡No se encontraron puntos críticos de mejora!</li>";
+        document.getElementById('correctList').innerHTML = correct.map(c => `<li>${c}</li>`).join('') || "<li>Sigue practicando para fortalecer tu escritura.</li>";
         document.getElementById('feedbackArea').style.display = 'block';
-        document.getElementById('levelBadgeArea').innerHTML = `<div class="level-badge" style="background-color: var(--primary)">Processing...</div>`;
 
-        // ENVÍO A DRIVE
+        // Envío de datos
         const btn = document.getElementById('submitBtn');
-        btn.innerText = "Saving Submission...";
+        btn.innerText = "Enviando Tarea...";
         btn.disabled = true;
-
-        const payload = {
-            firstName: fName,
-            lastName: lName,
-            course: course,
-            text: text,
-            level: "Calculated Level" // Aquí puedes integrar tu función getLevel()
-        };
 
         try {
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify(payload),
+                body: JSON.stringify({ firstName: fName, lastName: lName, course: course, text: text }),
                 headers: { 'Content-Type': 'application/json' }
             });
             
-            // MARCAR COMO ENVIADO EN EL NAVEGADOR
-            localStorage.setItem("taskSubmitted", "true");
-            alert("✅ Successfully saved! You cannot submit again.");
-            location.reload(); // Recargar para bloquear todo
-
-        } catch (error) {
-            alert("❌ Error connecting to Drive.");
+            localStorage.setItem("assignment_completed", "true");
+            alert("✅ Tarea enviada correctamente a tu profesor.");
+            btn.innerText = "Tarea Enviada";
+        } catch (e) {
+            alert("Error al enviar a Drive. No te preocupes, puedes ver tu retroalimentación abajo.");
             btn.disabled = false;
-            btn.innerText = "Submit Task";
+            btn.innerText = "Reintentar Envío";
         }
+        
+        document.getElementById('feedbackArea').scrollIntoView({ behavior: 'smooth' });
     }
 </script>
+
 </body>
 </html>
