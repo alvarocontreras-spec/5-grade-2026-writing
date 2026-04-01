@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> WRITING TASK II: Daily Routine</title>
+    <title>WRITING TASK II: DAILY ROUTINE</title>
     <style>
         :root {
             --primary: #2980b9;
@@ -26,6 +26,7 @@
         }
 
         header { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 25px; padding-bottom: 10px; }
+        h1 { color: var(--primary); margin-bottom: 5px; }
 
         .student-info-grid {
             display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;
@@ -40,8 +41,9 @@
         .model { background: #fdf2e9; border: 1px solid #e67e22; grid-column: span 2; color: #d35400; font-weight: 500; }
 
         textarea {
-            width: 100%; height: 200px; padding: 20px; font-size: 1.1rem;
+            width: 100%; height: 220px; padding: 20px; font-size: 1.1rem;
             border: 2px solid #ddd; border-radius: 12px; resize: none; box-sizing: border-box;
+            font-family: inherit; transition: border 0.3s;
         }
 
         .button-group { display: flex; gap: 15px; margin-top: 20px; }
@@ -52,35 +54,43 @@
 
         #feedbackArea {
             margin-top: 30px; display: none; padding: 25px; border-radius: 12px;
-            background: #f9f9f9; border: 2px solid #eee;
+            background: #f9f9f9; border: 2px solid #eee; animation: fadeIn 0.5s;
         }
 
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .report-title { font-weight: bold; display: block; margin-top: 15px; color: var(--primary); }
-        .feedback-list { padding-left: 20px; }
+        .feedback-list { padding-left: 20px; margin-top: 5px; }
         .improve { color: #d35400; font-weight: 600; }
         .correct { color: var(--success); font-weight: 600; }
+        
+        #blockMessage {
+            display:none; color: var(--error); text-align: center; font-weight: bold; 
+            margin-bottom: 20px; padding: 15px; border: 1px solid var(--error); 
+            border-radius: 8px; background: #fdeaea;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Writing Assessment: Daily Routine</h1>
-        <p>1. Write -> 2. Check Feedback -> 3. Final Submit</p>
+        <h1>WRITING TASK II: DAILY ROUTINE</h1>
+        <p>Step 1: Write | Step 2: Check Feedback | Step 3: Final Submission</p>
     </header>
 
-    <div id="blockMessage" style="display:none; color: var(--error); text-align: center; font-weight: bold; margin-bottom: 20px; padding: 15px; border: 1px solid var(--error); border-radius: 8px;">
-        ⚠️ Assignment already submitted.
+    <div id="blockMessage">
+        ⚠️ Access Denied: You have already submitted this task.
     </div>
 
     <div class="student-info-grid">
-        <input type="text" id="firstName" placeholder="First Name">
-        <input type="text" id="lastName" placeholder="Last Name">
-        <input type="text" id="course" placeholder="Class / Grade">
+        <input type="text" id="firstName" placeholder="First Name" required>
+        <input type="text" id="lastName" placeholder="Last Name" required>
+        <input type="text" id="course" placeholder="Class / Grade" required>
     </div>
 
     <div class="instruction-grid">
-        <div class="box instructions"><strong>📝 Task:</strong> 40-60 words. Use <strong>Present Simple</strong>.</div>
+        <div class="box instructions"><strong>📝 Rules:</strong> Write 40-60 words. Use <strong>Present Simple</strong>.</div>
         <div class="box vocabulary">
             <strong>🧱 Keywords & Connectors:</strong> <br>
             wake up, school, lunch, happy, study. <br>
@@ -92,7 +102,7 @@
         </div>
     </div>
 
-    <textarea id="writingBox" placeholder="Start writing your routine here..."></textarea>
+    <textarea id="writingBox" placeholder="Start typing your daily routine here..."></textarea>
     
     <div class="button-group">
         <button id="checkBtn" class="btn btn-check" onclick="provideFeedback()">1. Get Feedback & Improve</button>
@@ -100,7 +110,7 @@
     </div>
 
     <div id="feedbackArea">
-        <h2 style="text-align: center; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Feedback Report</h2>
+        <h2 style="text-align: center; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Teacher's Feedback</h2>
         <span class="report-title">💡 Suggestions for improvement:</span>
         <ul id="improveList" class="feedback-list"></ul>
         <span class="report-title">✅ Well done:</span>
@@ -115,12 +125,12 @@
         const text = document.getElementById('writingBox').value.trim();
         const words = text.split(/\s+/).filter(w => w.length > 0);
         
-        if (words.length < 10) return alert("Please write more before checking.");
+        if (words.length < 10) return alert("Your text is too short. Please write more before checking.");
 
         // ANTI-PLAGIARISM CHECK
-        const forbidden = ["mars", "screws", "robot", "alien"];
+        const forbidden = ["mars", "screws", "robot", "alien", "blue screws"];
         if (forbidden.some(w => text.toLowerCase().includes(w))) {
-            return alert("❌ Plagiarism detected! Please write about your OWN routine, not the Mars example.");
+            return alert("❌ PLAGIARISM DETECTED: Write about your own life, not the Mars example.");
         }
 
         const improve = [];
@@ -128,31 +138,36 @@
 
         // CONNECTOR CHECKING
         const connectors = ["and", "but", "also", "moreover", "in addition"];
-        const foundConnectors = connectors.filter(c => new RegExp(`\\b${c}\\b`, 'i').test(text));
+        const foundConnectors = connectors.filter(c => {
+            const regex = new RegExp(`\\b${c}\\b`, 'i');
+            return regex.test(text);
+        });
 
         if (foundConnectors.length === 0) {
-            improve.push(`<span class="improve">Connectors:</span> Use linking words like "and", "but", "also", "moreover", or "in addition".`);
+            improve.push(`<span class="improve">Connectors:</span> Try adding linking words (and, but, also, moreover, in addition).`);
         } else {
-            correct.push(`Great! You used these connectors: <strong>${foundConnectors.join(", ")}</strong>.`);
+            correct.push(`Excellent! You used: <strong>${foundConnectors.join(", ")}</strong>.`);
             if (foundConnectors.length < 3) {
-                improve.push(`<span class="improve">Variety:</span> Try to use at least 3 different connectors for better flow.`);
+                improve.push(`<span class="improve">Variety:</span> You used ${foundConnectors.length} connectors. Using 3 or more makes your writing better.`);
             }
         }
 
-        // GRAMMAR & STRUCTURE
-        if (/\bI\s+wakes\b/i.test(text)) improve.push(`<span class="improve">Grammar:</span> Remember: "I wake", not "I wakes".`);
-        if (/\bgo school\b/i.test(text)) improve.push(`<span class="improve">Prepositions:</span> Say "go TO school".`);
+        // GRAMMAR & COMMON MISTAKES
+        if (/\bI\s+wakes\b/i.test(text)) improve.push(`<span class="improve">Grammar:</span> With "I", use "wake" (not "wakes").`);
+        if (/\bgo school\b/i.test(text)) improve.push(`<span class="improve">Structure:</span> Remember the preposition: "go TO school".`);
 
-        // WORD COUNT
-        if (words.length < 40 || words.length > 60) {
-            improve.push(`<span class="improve">Length:</span> Your text has ${words.length} words. Aim for 40-60.`);
+        // WORD COUNT ANALYSIS
+        if (words.length < 40) {
+            improve.push(`<span class="improve">Length:</span> Short (${words.length} words). Reach at least 40.`);
+        } else if (words.length > 60) {
+            improve.push(`<span class="improve">Length:</span> Long (${words.length} words). Keep it under 60.`);
         } else {
-            correct.push("Word count is within the required range.");
+            correct.push("Perfect word count (40-60 range).");
         }
 
-        // DISPLAY FEEDBACK
-        document.getElementById('improveList').innerHTML = improve.map(i => `<li>${i}</li>`).join('') || "<li>No major errors detected. Ready to submit!</li>";
-        document.getElementById('correctList').innerHTML = correct.map(c => `<li>${c}</li>`).join('') || "<li>Keep writing to show your strengths.</li>";
+        // UPDATE FEEDBACK UI
+        document.getElementById('improveList').innerHTML = improve.map(i => `<li>${i}</li>`).join('') || "<li>Everything looks ready for submission!</li>";
+        document.getElementById('correctList').innerHTML = correct.map(c => `<li>${c}</li>`).join('') || "<li>Check your work to see your strengths.</li>";
         document.getElementById('feedbackArea').style.display = 'block';
         
         // UNLOCK SUBMIT BUTTON
@@ -161,35 +176,50 @@
     }
 
     async function finalSubmission() {
-        const data = {
-            firstName: document.getElementById('firstName').value.trim(),
-            lastName: document.getElementById('lastName').value.trim(),
-            course: document.getElementById('course').value.trim(),
-            text: document.getElementById('writingBox').value.trim()
-        };
+        const text = document.getElementById('writingBox').value.trim();
+        const fName = document.getElementById('firstName').value.trim();
+        const lName = document.getElementById('lastName').value.trim();
+        const course = document.getElementById('course').value.trim();
 
-        if (!data.firstName || !data.lastName || !data.course) return alert("Please fill in your personal information.");
+        if (!fName || !lName || !course || !text) {
+            return alert("Please complete your name, class, and writing task.");
+        }
+
+        if (!confirm("Confirm Submission? You won't be able to edit this again.")) return;
 
         const btn = document.getElementById('submitBtn');
-        btn.innerText = "Submitting Final Version...";
+        const checkBtn = document.getElementById('checkBtn');
+        
+        btn.innerText = "Uploading to teacher...";
         btn.disabled = true;
+        checkBtn.disabled = true;
+
+        const data = { firstName: fName, lastName: lName, course: course, text: text };
 
         try {
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify(data) 
+            });
+            
             localStorage.setItem("assignment_completed", "true");
-            alert("✅ Assignment successfully submitted!");
+            alert("✅ SUCCESS: Your task has been submitted!");
             location.reload();
         } catch (e) {
-            alert("Error submitting. Please try again.");
+            alert("Error: Connection lost. Try submitting again.");
             btn.disabled = false;
+            checkBtn.disabled = false;
             btn.innerText = "2. Submit Final Version";
         }
     }
 
+    // LOCK SYSTEM FOR PREVIOUS SUBMISSIONS
     window.onload = () => {
         if (localStorage.getItem("assignment_completed") === "true") {
             document.querySelectorAll('input, textarea, button').forEach(el => el.disabled = true);
             document.getElementById('blockMessage').style.display = 'block';
+            document.getElementById('writingBox').style.opacity = "0.5";
         }
     };
 </script>
