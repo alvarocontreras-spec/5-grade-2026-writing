@@ -129,7 +129,8 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycby-0PHNKPAI-eq766H9GF8aKQ5YDi5omxdx28s94LjnOxrQH7J5x-L6cw4YJGBP9wxxOQ/exec";
+    // YOUR UPDATED URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwK4vsNOAqu_ezfn3Kl6DjN0NDEi0S-0LhM1Vm1lZ3sBsdn_R87hRCUl9cXd189Zdw3oA/exec";
 
     function provideFeedback() {
         const text = document.getElementById('writingBox').value.trim();
@@ -137,7 +138,6 @@
         
         if (words.length < 10) return alert("Write at least 10 words to analyze.");
 
-        // ANTI-PLAGIARISM
         const forbidden = ["mars", "screws", "robot", "alien", "blue screws"];
         if (forbidden.some(w => text.toLowerCase().includes(w))) {
             return alert("❌ PLAGIARISM DETECTED: Do not use the 'Mars' or 'Robot' example!");
@@ -146,7 +146,6 @@
         const improve = [];
         const correct = [];
 
-        // CONNECTORS CHECK
         const connectors = ["and", "but", "also", "moreover", "in addition", "then", "after that"];
         const found = connectors.filter(c => new RegExp(`\\b${c}\\b`, 'i').test(text));
 
@@ -157,11 +156,9 @@
             if (found.length < 3) improve.push(`<span class="improve">Variety:</span> Try using 3 or more connectors.`);
         }
 
-        // GRAMMAR
         if (/\bI\s+wakes\b/i.test(text)) improve.push(`<span class="improve">Grammar:</span> Use "I wake", not "I wakes".`);
         if (/\bgo school\b/i.test(text)) improve.push(`<span class="improve">Structure:</span> Say "go TO school".`);
 
-        // WORD COUNT
         if (words.length < 40 || words.length > 60) {
             improve.push(`<span class="improve">Word Count:</span> You have ${words.length} words. Target is 40-60.`);
         } else {
@@ -175,6 +172,21 @@
         document.getElementById('feedbackArea').scrollIntoView({ behavior: 'smooth' });
     }
 
+    function downloadLocalWord(fName, lName, course, text) {
+        var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'></head><body>";
+        var footer = "</body></html>";
+        var content = "<h2>WRITING TASK II: DAILY ROUTINE</h2><p><b>Student:</b> " + fName + " " + lName + "</p><p><b>Class:</b> " + course + "</p><hr><p>" + text.replace(/\n/g, "<br>") + "</p>";
+        var source = header + content + footer;
+        var blob = new Blob(['\ufeff', source], { type: 'application/msword' });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = course + "_" + lName + "_" + fName + ".doc";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     async function finalSubmission() {
         const text = document.getElementById('writingBox').value.trim();
         const fName = document.getElementById('firstName').value.trim();
@@ -182,20 +194,27 @@
         const course = document.getElementById('course').value.trim();
 
         if (!fName || !lName || !course || !text) return alert("Fill in all fields and text.");
-        if (!confirm("Confirm Final Submission?")) return;
+        if (!confirm("Confirm Final Submission? This will also download a Word copy.")) return;
 
         const btn = document.getElementById('submitBtn');
         btn.innerText = "Submitting...";
         btn.disabled = true;
 
         try {
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ firstName: fName, lastName: lName, course: course, text: text }) });
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ firstName: fName, lastName: lName, course: course, text: text }) 
+            });
+            
+            downloadLocalWord(fName, lName, course, text);
             localStorage.setItem("assignment_completed", "true");
-            alert("✅ Successfully submitted!");
+            alert("✅ Successfully submitted! A Word copy has been downloaded.");
             location.reload();
         } catch (e) {
             alert("Error submitting. Try again.");
             btn.disabled = false;
+            btn.innerText = "2. Submit Final Version";
         }
     }
 
